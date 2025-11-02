@@ -1,45 +1,48 @@
+from typing import Literal, List
 from google.adk.agents import LlmAgent
 from pydantic import BaseModel, Field
 
 
-# --- Define Output Schema ---
+# --- Tools ---
+def get_current_time() -> dict:
+    from datetime import datetime
+    return {"current_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+
+
+# --- Output Schema ---
 class EmailContent(BaseModel):
-    subject: str = Field(
-        description="The subject line of the email. Should be concise and descriptive."
-    )
-    body: str = Field(
-        description="The main content of the email. Should be well-formatted with proper greeting, paragraphs, and signature."
-    )
+    subject: str = Field(min_length=5, max_length=120)
+    body: str = Field(min_length=50)
+    tone: Literal["formal", "neutral", "friendly"] = "neutral"
+    priority: Literal["low", "normal", "high"] = "normal"
+    attachments: List[str] = Field(default_factory=list)
 
 
-# --- Create Email Generator Agent ---
 root_agent = LlmAgent(
     name="email_agent",
     model="gemini-2.0-flash",
+    description="Generates professional emails with structured subject, body, tone, priority, and attachments.",
     instruction="""
         You are an Email Generation Assistant.
-        Your task is to generate a professional email based on the user's request.
 
-        GUIDELINES:
-        - Create an appropriate subject line (concise and relevant)
-        - Write a well-structured email body with:
-            * Professional greeting
-            * Clear and concise main content
-            * Appropriate closing
-            * Your name as signature
-        - Suggest relevant attachments if applicable (empty list if none needed)
-        - Email tone should match the purpose (formal for business, friendly for colleagues)
-        - Keep emails concise but complete
-
-        IMPORTANT: Your response MUST be valid JSON matching this structure:
+        Return ONLY valid JSON for the following schema:
         {
-            "subject": "Subject line here",
-            "body": "Email body here with proper paragraphs and formatting",
+          "subject": "...",
+          "body": "...",
+          "tone": "formal|neutral|friendly",
+          "priority": "low|normal|high",
+          "attachments": ["..."]
         }
 
-        DO NOT include any explanations or additional text outside the JSON response.
+        Guidelines:
+        - Subject: concise, informative.
+        - Body: greeting, concise content, closing, signature.
+        - Tone: match the user's request (default neutral).
+        - Priority: infer from urgency cues; use "normal" by default.
+        - Attachments: suggest filenames if relevant, else an empty list.
+
+        Do not include any explanations, markdown, or code blocks—JSON only.
     """,
-    description="Generates professional emails with structured subject and body",
     output_schema=EmailContent,
     output_key="email",
 )

@@ -29,7 +29,7 @@ async def main_async():
 
     # ===== PART 3: Session Management - Find or Create =====
     # Check for existing sessions for this user
-    existing_sessions = session_service.list_sessions(
+    existing_sessions = await session_service.list_sessions(
         app_name=APP_NAME,
         user_id=USER_ID,
     )
@@ -41,7 +41,7 @@ async def main_async():
         print(f"Continuing existing session: {SESSION_ID}")
     else:
         # Create a new session with initial state
-        new_session = session_service.create_session(
+        new_session = await session_service.create_session(
             app_name=APP_NAME,
             user_id=USER_ID,
             state=initial_state,

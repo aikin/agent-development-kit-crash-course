@@ -6,25 +6,25 @@ This repository contains examples for learning Google's Agent Development Kit (A
 
 ### Setup Environment
 
-You only need to create one virtual environment for all examples in this course. Follow these steps to set it up:
+This project uses [uv](https://docs.astral.sh/uv/) for fast and reliable Python package and project management. Follow these steps to set it up:
 
 ```bash
-# Create virtual environment in the root directory
-python -m venv .venv
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Activate (each new terminal)
-# macOS/Linux:
-source .venv/bin/activate
-# Windows CMD:
-.venv\Scripts\activate.bat
-# Windows PowerShell:
-.venv\Scripts\Activate.ps1
+# Install dependencies and create virtual environment
+uv sync
 
-# Install dependencies
-pip install -r requirements.txt
+# Run Python scripts using uv
+uv run python your_script.py
+
+# Or activate the virtual environment manually
+source .venv/bin/activate  # macOS/Linux
+# .venv\Scripts\activate.bat  # Windows CMD
+# .venv\Scripts\Activate.ps1  # Windows PowerShell
 ```
 
-Once set up, this single environment will work for all examples in the repository.
+Once set up, this single environment will work for all examples in the repository. The `uv sync` command will automatically create a virtual environment and install all dependencies specified in `pyproject.toml`.
 
 ### Setting Up API Keys
 
